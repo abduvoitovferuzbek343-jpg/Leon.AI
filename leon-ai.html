@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leon AI — Universal AI Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #03030e;
+    --s1: #0a0a1e;
+    --s2: #11112a;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --cl: #a78bfa;
+    --cl2: #7c3aed;
+    --cg: #34d399;
+    --cb: #60a5fa;
+    --co: #fb923c;
+    --cp: #f472b6;
+    --cy: #facc15;
+    --text: #f0eeff;
+    --text2: #9b97b8;
+    --text3: #3f3d60;
+    --r: 12px;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  #bg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── SHELL ── */
+  .shell {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    height: 56px;
+    background: rgba(3,3,14,0.8);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-shrink: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  #logo-canvas {
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.8px;
+    background: linear-gradient(135deg, #e0e7ff, #a78bfa, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradshift 5s ease-in-out infinite;
+  }
+
+  @keyframes gradshift {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(30deg); }
+  }
+
+  .model-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(167,139,250,0.08);
+    border: 1px solid rgba(167,139,250,0.22);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--cl);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    user-select: none;
+  }
+  .model-pill:hover { background: rgba(167,139,250,0.15); border-color: var(--cl); }
+
+  .sdot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 8px #34d399;
+    animation: pdot 2s ease-in-out infinite;
+  }
+  @keyframes pdot { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+  .ibtn {
+    width: 34px; height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    transition: all 0.2s;
+  }
+  .ibtn:hover { background: rgba(167,139,250,0.08); color: var(--cl); border-color: rgba(167,139,250,0.3); }
+
+  /* ── MAIN ── */
+  .main { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 210px;
+    background: rgba(3,3,14,0.65);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 14px 10px;
+    gap: 2px;
+    flex-shrink: 0;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .new-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #5b21b6, #7c3aed, #a78bfa);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    margin-bottom: 14px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 24px rgba(109,40,217,0.35);
+  }
+  .new-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(109,40,217,0.45); }
+  .new-btn:active { transform: translateY(0); }
+
+  .nav-lbl {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 12px 8px 4px;
+  }
+
+  .nav-it {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 9px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    background: transparent;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    text-align: left;
+  }
+  .nav-it:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-it.act {
+    background: rgba(167,139,250,0.1);
+    color: var(--cl);
+    border-left: 2px solid var(--cl);
+    padding-left: 7px;
+  }
+  .nav-it i { font-size: 15px; }
+
+  .hist {
+    padding: 6px 9px;
+    border-radius: 7px;
+    font-size: 11px;
+    color: var(--text3);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.15s;
+  }
+  .hist:hover { background: rgba(255,255,255,0.04); color: var(--text2); }
+
+  /* ── CHAT COLUMN ── */
+  .chat-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── BOT TABS ── */
+  .bot-tabs {
+    display: flex;
+    gap: 0;
+    padding: 10px 18px 0;
+    border-bottom: 1px solid var(--border);
+    background: rgba(3,3,14,0.6);
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+  }
+
+  .bt {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    border-radius: 9px 9px 0 0;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-bottom: none;
+    color: var(--text3);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+    position: relative;
+    bottom: -1px;
+    letter-spacing: 0.2px;
+  }
+  .bt.act {
+    background: rgba(3,3,14,0.95);
+    border-color: var(--border);
+    border-bottom: 1px solid rgba(3,3,14,0.95);
+    color: white;
+  }
+  .bt-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── MESSAGES ── */
+  .msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
+  .msgs::-webkit-scrollbar { width: 3px; }
+  .msgs::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.2); border-radius: 4px; }
+
+  /* ── WELCOME ── */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    gap: 22px;
+    padding: 20px;
+  }
+
+  .leon-ring {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #ring-canvas { position: absolute; inset: 0; }
+
+  .leon-inner {
+    width: 68px; height: 68px;
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 30px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    animation: inner-pulse 3s ease-in-out infinite;
+  }
+  .leon-inner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg,#4f46e5,#7c3aed,#a78bfa,#34d399);
+    animation: gradshift 4s ease-in-out infinite;
+  }
+  .leon-inner span { position: relative; z-index: 1; }
+
+  @keyframes inner-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(167,139,250,0.5); }
+    50% { box-shadow: 0 0 0 16px rgba(167,139,250,0); }
+  }
+
+  .w-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    background: linear-gradient(135deg,#e0e7ff,#a78bfa,#60a5fa,#34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradshift 5s ease-in-out infinite;
+  }
+
+  .w-sub {
+    font-size: 14px;
+    color: var(--text2);
+    text-align: center;
+    max-width: 360px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .sug-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .sc {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .sc:hover { border-color: var(--cl); background: rgba(167,139,250,0.07); transform: translateY(-2px); }
+  .sc-i { font-size: 20px; margin-bottom: 8px; display: block; }
+  .sc-t { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .sc-s { font-size: 11px; color: var(--text3); }
+
+  /* ── MESSAGE BUBBLES ── */
+  .msg-row { display: flex; gap: 10px; animation: fadeUp 0.3s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .msg-row.user { flex-direction: row-reverse; }
+
+  .av {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .av.leon { background: linear-gradient(135deg,#5b21b6,#a78bfa); }
+  .av.gpt { background: linear-gradient(135deg,#065f46,#10a37f); }
+  .av.user { background: rgba(255,255,255,0.07); border: 1px solid var(--border2); color: var(--text2); }
+
+  .bwrap { display: flex; flex-direction: column; max-width: 76%; }
+
+  .bot-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .lbl-leon { color: var(--cl); }
+  .lbl-gpt { color: #34d399; }
+
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 13px;
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  .msg-row.leon .bubble,
+  .msg-row.gpt .bubble {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-top-left-radius: 3px;
+  }
+  .msg-row.user .bubble {
+    background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    color: white;
+    border-top-right-radius: 3px;
+  }
+  .bubble code {
+    background: rgba(255,255,255,0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* ── TYPING ── */
+  .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+  .typing span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text3);
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  /* ── INPUT AREA ── */
+  .inp-area {
+    padding: 14px 20px 18px;
+    flex-shrink: 0;
+    background: rgba(3,3,14,0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .inp-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(167,139,250,0.18);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .inp-box:focus-within {
+    border-color: rgba(167,139,250,0.5);
+    box-shadow: 0 0 0 3px rgba(167,139,250,0.07);
+  }
+
+  .inp-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+
+  #inp {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    resize: none;
+    line-height: 1.6;
+    max-height: 110px;
+    overflow-y: auto;
+    padding: 0;
+  }
+  #inp::placeholder { color: var(--text3); }
+
+  .send-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg,#5b21b6,#a78bfa);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 15px;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+  }
+  .send-btn:hover { transform: scale(1.07); box-shadow: 0 6px 20px rgba(124,58,237,0.5); }
+  .send-btn:active { transform: scale(0.95); }
+
+  .inp-tools {
+    display: flex;
+    gap: 5px;
+    padding: 0 14px 11px;
+    border-top: 1px solid var(--border);
+    padding-top: 9px;
+    align-items: center;
+  }
+
+  .tpill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tpill:hover, .tpill.on { border-color: var(--cl); color: var(--cl); background: rgba(167,139,250,0.08); }
+  .tpill i { font-size: 12px; }
+
+  .enc {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .footer-bar {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text3);
+    padding: 5px 0 0;
+    letter-spacing: 0.5px;
+  }
+  .footer-bar span { color: rgba(167,139,250,0.5); }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo" onclick="newChat()">
+      <canvas id="logo-canvas" width="34" height="34"></canvas>
+      <span class="logo-text">LEON</span>
+    </div>
+    <div class="model-pill" onclick="cycleModel()">
+      <div class="sdot"></div>
+      <span id="mname">Leon Core 1.0</span>
+      <i class="ti ti-chevron-down" style="font-size:10px;margin-left:2px"></i>
+    </div>
+    <div class="topbar-right">
+      <button class="ibtn" title="Search"><i class="ti ti-search"></i></button>
+      <button class="ibtn" title="Notifications"><i class="ti ti-bell"></i></button>
+      <button class="ibtn" title="Profile"><i class="ti ti-user-circle"></i></button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <button class="new-btn" onclick="newChat()">
+        <i class="ti ti-plus" style="font-size:15px"></i> New Chat
+      </button>
+      <button class="nav-it act"><i class="ti ti-message-2"></i> Chat</button>
+      <button class="nav-it"><i class="ti ti-sparkles"></i> Generate</button>
+      <button class="nav-it"><i class="ti ti-code"></i> Code</button>
+      <button class="nav-it"><i class="ti ti-chart-bar"></i> Analyze</button>
+      <button class="nav-it"><i class="ti ti-settings"></i> Settings</button>
+      <div class="nav-lbl">History</div>
+      <div class="hist" onclick="ld('Explain quantum computing in simple terms')">Quantum computing</div>
+      <div class="hist" onclick="ld('Build a REST API in Python Flask')">Build REST API</div>
+      <div class="hist" onclick="ld('Compare Leon AI vs ChatGPT — which is better?')">Compare AI models</div>
+      <div class="hist" onclick="ld('Write a poem about the cosmos and stars')">Poem about cosmos</div>
+      <div class="hist" onclick="ld('Travel guide for Tashkent, Uzbekistan')">Tashkent travel guide</div>
+      <div class="hist" onclick="ld('Best way to learn machine learning from scratch')">Learn ML from scratch</div>
+    </div>
+
+    <!-- CHAT COLUMN -->
+    <div class="chat-col">
+
+      <!-- BOT TABS -->
+      <div class="bot-tabs">
+        <button class="bt act" id="tab-leon" onclick="setBot('leon')">
+          <div class="bt-dot" style="background:var(--cl);box-shadow:0 0 6px var(--cl)"></div>
+          Leon AI
+        </button>
+        <button class="bt" id="tab-gpt" onclick="setBot('gpt')">
+          <div class="bt-dot" style="background:#34d399;box-shadow:0 0 6px #34d399"></div>
+          ChatGPT
+        </button>
+        <button class="bt" id="tab-both" onclick="setBot('both')">
+          <i class="ti ti-arrows-split-2" style="font-size:12px"></i>
+          Both
+        </button>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="msgs" id="msgs">
+        <div class="welcome" id="wlc">
+          <div class="leon-ring">
+            <canvas id="ring-canvas" width="100" height="100"></canvas>
+            <div class="leon-inner"><span>L</span></div>
+          </div>
+          <div class="w-name">Leon</div>
+          <div class="w-sub">Your universal AI platform. Chat, create, code and analyze — powered by Leon AI and ChatGPT together.</div>
+          <div class="sug-grid">
+            <div class="sc" onclick="sg('Explain how black holes form and what happens inside them')">
+              <span class="sc-i"><i class="ti ti-galaxy" style="color:var(--cl)"></i></span>
+              <div class="sc-t">Explain anything</div>
+              <div class="sc-s">Deep, clear answers</div>
+            </div>
+            <div class="sc" onclick="sg('Write a short sci-fi story about an AI that becomes self-aware')">
+              <span class="sc-i"><i class="ti ti-pencil" style="color:var(--cg)"></i></span>
+              <div class="sc-t">Write & create</div>
+              <div class="sc-s">Stories, essays, copy</div>
+            </div>
+            <div class="sc" onclick="sg('Write Python code to build a neural network from scratch')">
+              <span class="sc-i"><i class="ti ti-code" style="color:var(--co)"></i></span>
+              <div class="sc-t">Code anything</div>
+              <div class="sc-s">50+ languages</div>
+            </div>
+            <div class="sc" onclick="sg('Compare Leon AI and ChatGPT — which is smarter?')">
+              <span class="sc-i"><i class="ti ti-arrows-split-2" style="color:var(--cp)"></i></span>
+              <div class="sc-t">Compare AIs</div>
+              <div class="sc-s">Side by side answers</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INPUT -->
+      <div class="inp-area">
+        <div class="inp-box">
+          <div class="inp-row">
+            <textarea id="inp" rows="1" placeholder="Ask Leon anything..." onkeydown="hk(event)" oninput="ar(this)"></textarea>
+            <button class="send-btn" onclick="send()"><i class="ti ti-arrow-up"></i></button>
+          </div>
+          <div class="inp-tools">
+            <button class="tpill on" id="t-web" onclick="tog('web')"><i class="ti ti-world"></i> Web Search</button>
+            <button class="tpill" id="t-code" onclick="tog('code')"><i class="ti ti-terminal"></i> Code</button>
+            <button class="tpill" id="t-file" onclick="tog('file')"><i class="ti ti-paperclip"></i> File</button>
+            <button class="tpill" id="t-img" onclick="tog('img')"><i class="ti ti-photo"></i> Image</button>
+            <div class="enc"><i class="ti ti-shield-check" style="font-size:12px;color:#34d399"></i> Encrypted</div>
+          </div>
+        </div>
+        <div class="footer-bar">Leon AI v1.0 &nbsp;·&nbsp; <span>Universal AI Platform</span> &nbsp;·&nbsp; Built with ❤</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── BACKGROUND CANVAS ──
+const bg = document.getElementById('bg');
+const bgx = bg.getContext('2d');
+let W, H;
+
+function resize() {
+  W = bg.width = window.innerWidth;
+  H = bg.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function rnd(a, b) { return a + Math.random() * (b - a); }
+
+class Orb {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = rnd(0, W); this.y = rnd(0, H);
+    this.r = rnd(100, 260);
+    this.vx = rnd(-0.1, 0.1); this.vy = rnd(-0.1, 0.1);
+    this.phase = rnd(0, Math.PI * 2); this.spd = rnd(0.003, 0.01);
+    const p = [[265,65,24],[285,55,20],[175,60,20],[205,65,22],[315,55,20],[145,55,18],[240,60,22]];
+    const c = p[Math.floor(Math.random() * p.length)];
+    this.h = c[0]; this.s = c[1]; this.l = c[2];
+  }
+  update() {
+    this.phase += this.spd;
+    this.x += this.vx + Math.sin(this.phase) * 0.5;
+    this.y += this.vy + Math.cos(this.phase * 0.7) * 0.4;
+    if (this.x < -300) this.x = W + 300;
+    if (this.x > W + 300) this.x = -300;
+    if (this.y < -300) this.y = H + 300;
+    if (this.y > H + 300) this.y = -300;
+  }
+  draw() {
+    const g = bgx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
+    g.addColorStop(0, `hsla(${this.h},${this.s}%,${this.l}%,0.48)`);
+    g.addColorStop(0.5, `hsla(${this.h},${this.s}%,${this.l}%,0.16)`);
+    g.addColorStop(1, `hsla(${this.h},${this.s}%,${this.l}%,0)`);
+    bgx.beginPath(); bgx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    bgx.fillStyle = g; bgx.fill();
+  }
+}
+
+class Aurora {
+  constructor(i) {
+    this.i = i;
+    this.hue = [265, 185, 300, 145, 215, 320, 170][i % 7];
+    this.phase = rnd(0, Math.PI * 2);
+    this.spd = rnd(0.002, 0.008);
+    this.amp = rnd(40, 110);
+    this.lw = rnd(12, 32);
+  }
+  update() { this.phase += this.spd; }
+  draw() {
+    bgx.beginPath();
+    const y = H * (0.1 + this.i * 0.13);
+    for (let j = 0; j <= 60; j++) {
+      const x = (j / 60) * W;
+      const yy = y + Math.sin(this.phase + j * 0.2 + this.i * 0.8) * this.amp
+               + Math.cos(this.phase * 0.5 + j * 0.1) * this.amp * 0.45;
+      j === 0 ? bgx.moveTo(x, yy) : bgx.lineTo(x, yy);
+    }
+    bgx.strokeStyle = `hsla(${this.hue},72%,58%,0.05)`;
+    bgx.lineWidth = this.lw; bgx.stroke();
+  }
+}
+
+class Star {
+  constructor() { this.reset(true); }
+  reset(init) {
+    this.x = rnd(0, W || 800);
+    this.y = init ? rnd(0, H || 600) : rnd((H || 600) * 0.6, H || 600);
+    this.r = rnd(0.3, 1.8);
+    this.vx = rnd(-0.15, 0.15); this.vy = rnd(-0.45, -0.08);
+    this.life = init ? rnd(0, 200) : 0;
+    this.max = rnd(120, 280);
+    this.hue = [265, 310, 185, 215, 330, 145][Math.floor(Math.random() * 6)];
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy; this.life++;
+    if (this.life > this.max || this.y < -8) this.reset(false);
+  }
+  draw() {
+    const a = Math.sin((this.life / this.max) * Math.PI) * 0.85;
+    bgx.beginPath(); bgx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    bgx.fillStyle = `hsla(${this.hue},90%,78%,${a})`; bgx.fill();
+  }
+}
+
+const orbs = Array.from({ length: 10 }, () => new Orb());
+const auroras = Array.from({ length: 7 }, (_, i) => new Aurora(i));
+const stars = Array.from({ length: 180 }, () => new Star());
+
+function bgLoop() {
+  bgx.fillStyle = 'rgba(3,3,14,0.11)';
+  bgx.fillRect(0, 0, W, H);
+  auroras.forEach(a => { a.update(); a.draw(); });
+  orbs.forEach(o => { o.update(); o.draw(); });
+  stars.forEach(s => { s.update(); s.draw(); });
+
+  // Center glow around logo area
+  const cx = W / 2, cy = H / 2;
+  const pr = 180 + Math.sin(Date.now() / 1000) * 15;
+  const gl = bgx.createRadialGradient(cx, cy, 0, cx, cy, pr);
+  gl.addColorStop(0, 'rgba(167,139,250,0.07)');
+  gl.addColorStop(0.5, 'rgba(96,165,250,0.03)');
+  gl.addColorStop(1, 'rgba(167,139,250,0)');
+  bgx.beginPath(); bgx.arc(cx, cy, pr, 0, Math.PI * 2);
+  bgx.fillStyle = gl; bgx.fill();
+
+  requestAnimationFrame(bgLoop);
+}
+bgLoop();
+
+// ── LOGO CANVAS ──
+const lc = document.getElementById('logo-canvas');
+const lx = lc.getContext('2d');
+function drawLogo() {
+  const t = Date.now() / 1000;
+  lx.clearRect(0, 0, 34, 34);
+  const g = lx.createLinearGradient(0, 0, 34, 34);
+  g.addColorStop(0, `hsl(${255 + Math.sin(t) * 20},70%,52%)`);
+  g.addColorStop(0.5, `hsl(${280 + Math.cos(t) * 15},65%,58%)`);
+  g.addColorStop(1, `hsl(${170 + Math.sin(t * 0.7) * 25},60%,48%)`);
+  lx.fillStyle = g;
+  const r = 10;
+  lx.beginPath();
+  lx.moveTo(r, 0); lx.lineTo(34 - r, 0);
+  lx.quadraticCurveTo(34, 0, 34, r);
+  lx.lineTo(34, 34 - r); lx.quadraticCurveTo(34, 34, 34 - r, 34);
+  lx.lineTo(r, 34); lx.quadraticCurveTo(0, 34, 0, 34 - r);
+  lx.lineTo(0, r); lx.quadraticCurveTo(0, 0, r, 0);
+  lx.closePath(); lx.fill();
+  lx.fillStyle = 'rgba(255,255,255,0.92)';
+  lx.font = 'bold 18px Syne, sans-serif';
+  lx.textAlign = 'center'; lx.textBaseline = 'middle';
+  lx.fillText('L', 17, 18);
+  requestAnimationFrame(drawLogo);
+}
+drawLogo();
+
+// ── RING CANVAS ──
+function drawRing() {
+  const rc = document.getElementById('ring-canvas');
+  if (!rc) return;
+  const rx = rc.getContext('2d');
+  const t = Date.now() / 1000;
+  rx.clearRect(0, 0, 100, 100);
+  const arcs = [
+    { r: 47, w: 2.5, speed: 1.0, c1: '#a78bfa', c2: '#60a5fa', start: 0, arc: 0.65 },
+    { r: 41, w: 1.8, speed: -1.3, c1: '#34d399', c2: '#a78bfa', start: Math.PI, arc: 0.5 },
+    { r: 35, w: 1.4, speed: 0.8, c1: '#f472b6', c2: '#facc15', start: Math.PI * 0.5, arc: 0.4 },
+  ];
+  arcs.forEach(a => {
+    const s = t * a.speed + a.start;
+    const gr = rx.createLinearGradient(0, 0, 100, 100);
+    gr.addColorStop(0, a.c1); gr.addColorStop(1, a.c2);
+    rx.beginPath(); rx.arc(50, 50, a.r, s, s + Math.PI * 2 * a.arc);
+    rx.strokeStyle = gr; rx.lineWidth = a.w; rx.lineCap = 'round'; rx.stroke();
+  });
+  const pulse = 0.35 + Math.sin(t * 2) * 0.15;
+  rx.beginPath(); rx.arc(50, 50, 48, 0, Math.PI * 2);
+  rx.strokeStyle = `rgba(167,139,250,${pulse * 0.22})`; rx.lineWidth = 1; rx.stroke();
+  requestAnimationFrame(drawRing);
+}
+drawRing();
+
+// ── APP LOGIC ──
+const models = ['Leon Core 1.0', 'Leon Pro 2.0', 'Leon Ultra 3.0'];
+let mi = 0;
+function cycleModel() {
+  mi = (mi + 1) % models.length;
+  document.getElementById('mname').textContent = models[mi];
+}
+
+let activeBot = 'leon';
+function setBot(b) {
+  activeBot = b;
+  ['leon', 'gpt', 'both'].forEach(x => document.getElementById('tab-' + x).classList.toggle('act', x === b));
+}
+
+function tog(t) { document.getElementById('t-' + t).classList.toggle('on'); }
+function hk(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+function ar(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 110) + 'px'; }
+
+function rmWelcome() { const w = document.getElementById('wlc'); if (w) w.remove(); }
+
+function addMsg(role, text, bot) {
+  rmWelcome();
+  const msgs = document.getElementById('msgs');
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + (role === 'user' ? 'user' : (bot || 'leon'));
+  const av = document.createElement('div');
+  av.className = 'av ' + (role === 'user' ? 'user' : (bot || 'leon'));
+  av.innerHTML = role === 'user'
+    ? '<i class="ti ti-user" style="font-size:13px"></i>'
+    : (bot === 'gpt'
+      ? '<i class="ti ti-brand-openai" style="font-size:14px;color:white"></i>'
+      : '<span style="font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:white">L</span>');
+  const wrap = document.createElement('div');
+  wrap.className = 'bwrap';
+  if (role !== 'user') {
+    const lbl = document.createElement('div');
+    lbl.className = 'bot-label ' + (bot === 'gpt' ? 'lbl-gpt' : 'lbl-leon');
+    lbl.textContent = bot === 'gpt' ? 'ChatGPT' : 'Leon AI';
+    wrap.appendChild(lbl);
+  }
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.innerHTML = text.replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\n/g, '<br>');
+  wrap.appendChild(bub);
+  row.appendChild(av); row.appendChild(wrap);
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping(bot) {
+  rmWelcome();
+  const msgs = document.getElementById('msgs');
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + (bot || 'leon');
+  const av = document.createElement('div');
+  av.className = 'av ' + (bot || 'leon');
+  av.innerHTML = bot === 'gpt'
+    ? '<i class="ti ti-brand-openai" style="font-size:14px;color:white"></i>'
+    : '<span style="font-family:Syne,sans-serif;font-size:12px;font-weight:800;color:white">L</span>';
+  const wrap = document.createElement('div');
+  wrap.className = 'bwrap';
+  const lbl = document.createElement('div');
+  lbl.className = 'bot-label ' + (bot === 'gpt' ? 'lbl-gpt' : 'lbl-leon');
+  lbl.textContent = bot === 'gpt' ? 'ChatGPT' : 'Leon AI';
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  wrap.appendChild(lbl); wrap.appendChild(bub);
+  row.appendChild(av); row.appendChild(wrap);
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+  return row;
+}
+
+const leonReplies = [
+  "Hello! I'm Leon, your universal AI platform.\n\nI've analyzed your question thoroughly. The core idea here is fascinating — it touches on principles that appear across many domains. Let me give you a clear, structured breakdown so you walk away with genuine insight.\n\nThe key is understanding the `underlying pattern`. Once you see it, everything else becomes intuitive. Want me to go deeper on any specific angle?",
+  "Great question — this is exactly where Leon shines.\n\nHere's my take: most people approach this backwards. They focus on the surface-level complexity when the real power lies in the `fundamental mechanism`. Understanding that one thing unlocks everything else.\n\nI'd suggest starting with the core concept, then building outward. Shall I map out a full breakdown for you?",
+  "I love this kind of question. Let me think through it carefully.\n\nThere are three layers to consider here: the conceptual foundation, the practical application, and the edge cases that trip most people up. Together they paint a complete picture.\n\nMy recommendation: start simple, iterate fast. The `best solutions` emerge from that cycle. Want a step-by-step walkthrough?"
+];
+
+const gptReplies = [
+  "Great question! Here's my perspective.\n\nAs an AI trained on a vast breadth of human knowledge, I can see multiple angles here. The most important thing to understand first is the foundational principle — everything else flows from that.\n\nI'd be happy to go deeper on any dimension of this. What aspect would be most useful for you right now?",
+  "This is something I find genuinely interesting to think through.\n\nThe short answer is nuanced, but the longer answer is actually quite elegant. When you look at the `full picture`, a clear pattern emerges that makes the whole thing intuitive rather than complicated.\n\nLet me know if you'd like a more technical breakdown or prefer to keep it conceptual.",
+  "Happy to help with that! Let me give you a thorough answer.\n\nThe key insight most people miss is the distinction between the `mechanism` and its effects. Conflating the two leads to confusion — separating them makes everything click.\n\nWould you like me to walk through a concrete example, or explore the theoretical side first?"
+];
+
+let ri_l = 0, ri_g = 0;
+function getLeon() { return leonReplies[ri_l++ % leonReplies.length]; }
+function getGPT() { return gptReplies[ri_g++ % gptReplies.length]; }
+
+function send() {
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  addMsg('user', text);
+  inp.value = ''; inp.style.height = 'auto';
+  const bots = activeBot === 'both' ? ['leon', 'gpt'] : [activeBot];
+  bots.forEach((bot, idx) => {
+    const t = addTyping(bot);
+    const delay = 1000 + idx * 700 + Math.random() * 600;
+    setTimeout(() => {
+      t.remove();
+      addMsg('ai', bot === 'gpt' ? getGPT() : getLeon(), bot);
+    }, delay);
+  });
+}
+
+function sg(text) { document.getElementById('inp').value = text; send(); }
+function ld(text) { newChat(); setTimeout(() => sg(text), 80); }
+
+function newChat() {
+  document.getElementById('msgs').innerHTML = `
+    <div class="welcome" id="wlc">
+      <div class="leon-ring">
+        <canvas id="ring-canvas" width="100" height="100"></canvas>
+        <div class="leon-inner"><span>L</span></div>
+      </div>
+      <div class="w-name">Leon</div>
+      <div class="w-sub">Your universal AI platform. Chat, create, code and analyze — powered by Leon AI and ChatGPT together.</div>
+      <div class="sug-grid">
+        <div class="sc" onclick="sg('Explain how black holes form and what happens inside them')">
+          <span class="sc-i"><i class="ti ti-galaxy" style="color:#a78bfa"></i></span>
+          <div class="sc-t">Explain anything</div><div class="sc-s">Deep, clear answers</div>
+        </div>
+        <div class="sc" onclick="sg('Write a short sci-fi story about an AI that becomes self-aware')">
+          <span class="sc-i"><i class="ti ti-pencil" style="color:#34d399"></i></span>
+          <div class="sc-t">Write & create</div><div class="sc-s">Stories, essays, copy</div>
+        </div>
+        <div class="sc" onclick="sg('Write Python code to build a neural network from scratch')">
+          <span class="sc-i"><i class="ti ti-code" style="color:#fb923c"></i></span>
+          <div class="sc-t">Code anything</div><div class="sc-s">50+ languages</div>
+        </div>
+        <div class="sc" onclick="sg('Compare Leon AI and ChatGPT — which is smarter?')">
+          <span class="sc-i"><i class="ti ti-arrows-split-2" style="color:#f472b6"></i></span>
+          <div class="sc-t">Compare AIs</div><div class="sc-s">Side by side answers</div>
+        </div>
+      </div>
+    </div>`;
+  drawRing();
+}
+</script>
+</body>
+</html>
